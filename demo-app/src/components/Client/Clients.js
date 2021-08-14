@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import ClientItem from "./ClientItem";
+
 import {
   Button,
   Col,
@@ -13,6 +14,7 @@ import {
   Checkbox,
   Form,
   Modal,
+  Spin,
 } from "antd";
 import Icon, {
   PlusOutlined,
@@ -20,6 +22,13 @@ import Icon, {
   FormOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
+import { useDispatch, useSelector } from "react-redux";
+import { getDataClient } from "../../services";
+import {
+  deleteClientAsync,
+  getDataClientAsync,
+} from "../../actions/clientAction";
+import typeClient from "../../utils/getTypeClient";
 const { Option } = Select;
 
 Clients.propTypes = {};
@@ -43,10 +52,33 @@ function Clients(props) {
   const [showModal, setShowModal] = useState(false);
   const [checkEdit, setCheckEdit] = useState(false);
   const [showModalProduct, setShowModalProduct] = useState(false);
+  const [modalDelete, setModalDelete] = useState(false);
+  const [dataDelete, setDataDelete] = useState();
+  const dispatch = useDispatch();
+  const clients = useSelector((state) => state.clients.listClient);
+  const [loadingTable, setLoadingTable] = useState(true);
+  const [filter, setFilter] = useState({
+    page: 1,
+  });
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // useEffect(() => {
+  //   let dataChange = clients.reduce((acc, item, index) => {
+  //     let data = { ...item, stt: index + 1 };
+  //     return [...acc, data];
+  //   }, []);
+  //   setDataTable([...dataChange]);
+  //   setLoadingTable(false);
+  // }, []);
+  const handleChangePage = (page, pageSize) => {
+    dispatch(getDataClientAsync({ page: page }));
+    setCurrentPage(page);
+  };
 
   const hiddenModal = () => {
     setShowModal(false);
     setShowModalProduct(false);
+    setModalDelete(false);
   };
   const PopUpModal = () => {
     setShowModal(true);
@@ -62,32 +94,49 @@ function Clients(props) {
   const onFinishFailed = () => {
     console.log("fail");
   };
-
+  const showModalDelete = (id) => {
+    console.log(id);
+    setModalDelete(true);
+    setDataDelete(id);
+  };
+  const confirmDeleteClient = () => {
+    dispatch(deleteClientAsync(dataDelete));
+    setModalDelete(false);
+  };
   const columns = [
     {
       title: "STT",
       align: "center",
       dataIndex: "stt",
       key: "stt",
+      render: (stt) => {
+        return <span>{stt}</span>;
+      },
     },
     {
       title: "Họ tên",
-      dataIndex: "name",
-      key: "name",
+      dataIndex: "fullName",
+      key: "fullName",
+      render: (fullName) => {
+        return <span>{fullName}</span>;
+      },
     },
     {
       title: "Loại khách hàng",
-      dataIndex: "type",
-      key: "type",
+      dataIndex: "totalMoney",
+      key: "totalMoney",
+      render: (totalMoney) => {
+        return <span>{typeClient(totalMoney)}</span>;
+      },
     },
     {
       title: "Quận huyện",
       dataIndex: "address",
       key: "address",
-      render: (dataIndex) => {
+      render: (address) => {
         return (
           <span style={{ wordWrap: "break-word", wordBreak: "break-word" }}>
-            {dataIndex}
+            {address.name}
           </span>
         );
       },
@@ -96,7 +145,9 @@ function Clients(props) {
     {
       title: "Action",
       with: "400px",
-      render: () => {
+      dataIndex: "_id",
+
+      render: (_id) => {
         return (
           <Space size="middle">
             <Button
@@ -106,7 +157,12 @@ function Clients(props) {
             >
               Thêm sản phẩm
             </Button>
-            <Button icon={<DeleteOutlined />} type="primary" danger>
+            <Button
+              icon={<DeleteOutlined />}
+              type="primary"
+              danger
+              onClick={() => showModalDelete(_id)}
+            >
               Xoá
             </Button>
             <Button
@@ -175,6 +231,7 @@ function Clients(props) {
       type: "Phụ kiện",
     },
   ];
+
   return (
     <div style={{ marginTop: "32px", height: "40px" }}>
       <Col>
@@ -263,18 +320,25 @@ function Clients(props) {
 
         <Row style={{ marginTop: "32px", marginRight: "30px" }}>
           <Col span={24}>
-            <Table
-              columns={columns}
-              dataSource={data}
-              bordered
-              //   pagination={false}
-            ></Table>
-            {/* <Pagination
-              current={1}
+            <Spin spinning={false}>
+              <Table
+                columns={columns}
+                dataSource={clients}
+                bordered
+                pagination={false}
+                // loading={{
+                //   indicator: !clients ? <Spin></Spin> : "",
+                // }}
+                //   pagination={false}
+              ></Table>
+            </Spin>
+            <Pagination
+              current={currentPage}
               total={50}
               size="large"
               style={{ textAlign: "right", marginTop: "10px" }}
-            /> */}
+              onChange={handleChangePage}
+            />
           </Col>
         </Row>
       </Col>
@@ -364,6 +428,19 @@ function Clients(props) {
             ></Table>
           </Col>
         </Row>
+      </Modal>
+
+      {/* Modal Delete */}
+      <Modal
+        visible={modalDelete}
+        onCancel={hiddenModal}
+        width={450}
+        closable={false}
+        onOk={confirmDeleteClient}
+      >
+        <h3 style={{ marginTop: "32px" }}>
+          Bạn có chắc muốn xoá thông tin khách hàng không?
+        </h3>
       </Modal>
     </div>
   );

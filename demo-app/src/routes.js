@@ -7,14 +7,14 @@ import NotFond from "./components/NotFound/NotFond";
 
 const routes = [
   {
-    path: "/",
-    exact: true,
-    main: HomePage,
-  },
-  {
     path: "/login",
     exact: false,
     main: LoginPage,
+  },
+  {
+    path: "/",
+    exact: true,
+    main: HomePage,
   },
 
   {

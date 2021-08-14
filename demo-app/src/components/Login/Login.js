@@ -1,15 +1,34 @@
 import React from "react";
-import { Button, Col, Form, Input, Row, Typography } from "antd";
+import { Button, Col, Form, Input, message, Row, Typography } from "antd";
+import { login } from "../../services";
+import { useDispatch } from "react-redux";
+import { loginReducer } from "../../actions/loginAction";
+import { useHistory } from "react-router-dom";
 const { Title } = Typography;
 
 Login.propTypes = {};
 
 function Login(props) {
-  //   const handleChangeValue = (change, value) => {
-  //     // console.log(change, "=", value);
-  //   };
+  const dispatch = useDispatch();
+  const history = useHistory();
   const handleSbumit = (value) => {
-    console.log(value);
+    const { username, password } = value;
+    const data = {
+      username,
+      password,
+    };
+    login(data)
+      .then((res) => {
+        if (res.data && res.data.status) {
+          localStorage.setItem("accessToken", res.data.token);
+          dispatch(loginReducer(res.data.user));
+          message.success("Đăng nhập thành công");
+          history.push("/");
+        } else {
+          message.error("Sai tên đăng nhập hoặc tài khoản!!");
+        }
+      })
+      .catch((err) => console.log(err));
   };
   return (
     <div>
