@@ -41,3 +41,21 @@ export const deleteClientAsync = (id) => {
     });
   };
 };
+export const addClientAsync = (client) => {
+  return (dispatch) => {
+    API.addClient(client).then((res) => {
+      if (res.data && res.data.status) {
+        message.success("Thêm khách hàng thành công");
+        dispatch(addClientReducer(res.data.newGuest));
+      } else {
+        message.error("Thêm thất bại");
+      }
+    });
+  };
+};
+export const addClientReducer = (client) => {
+  return {
+    type: types.ADD_CLIENT,
+    payload: client,
+  };
+};

@@ -30,14 +30,14 @@ function MenuComponent(props) {
   return (
     // collapsed={this.state.collapsed}
     <SliderStyled trigger={null} collapsible width={300}>
-      <div className="logo" />
+      <div className="logo" style={{}} />
       <Menu
         theme="dark"
         mode="vertical "
         defaultSelectedKeys={[location.pathname]}
       >
         <Menu.Item
-          style={{ height: "60px", lineHeight: "60px" }}
+          style={{ height: "60px", lineHeight: "60px", cursor: "pointer" }}
           key="/"
           icon={<BarChartOutlined />}
         >
@@ -45,7 +45,7 @@ function MenuComponent(props) {
         </Menu.Item>
 
         <Menu.Item
-          style={{ height: "60px", lineHeight: "60px" }}
+          style={{ height: "60px", lineHeight: "60px", cursor: "pointer" }}
           key="/clients"
           icon={<TeamOutlined />}
         >
@@ -53,7 +53,7 @@ function MenuComponent(props) {
         </Menu.Item>
 
         <Menu.Item
-          style={{ height: "60px", lineHeight: "60px" }}
+          style={{ height: "60px", lineHeight: "60px", cursor: "pointer" }}
           key="/staffs"
           icon={<UserOutlined />}
         >
@@ -61,7 +61,7 @@ function MenuComponent(props) {
         </Menu.Item>
 
         <Menu.Item
-          style={{ height: "60px", lineHeight: "60px" }}
+          style={{ height: "60px", lineHeight: "60px", cursor: "pointer" }}
           key="/products"
           icon={<ShoppingCartOutlined />}
         >

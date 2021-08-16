@@ -10,7 +10,7 @@ export const auth = () => {
 // Clients
 export const getDataClient = (params) => {
   const { page, search } = params || {};
-  const url = `/guests?page=${page || 1}`;
+  let url = `/guests?page=${page || 1}`;
   if (search) {
     url += `&search=${search}`;
   }
@@ -18,4 +18,7 @@ export const getDataClient = (params) => {
 };
 export const deleteClient = (id) => {
   return callApi(`/guests/${id}`, "DELETE", null);
+};
+export const addClient = (client) => {
+  return callApi("/guests", "POST", client);
 };

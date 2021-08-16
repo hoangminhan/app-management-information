@@ -19,6 +19,7 @@ function Login(props) {
     };
     login(data)
       .then((res) => {
+        debugger;
         if (res.data && res.data.status) {
           localStorage.setItem("accessToken", res.data.token);
           dispatch(loginReducer(res.data.user));

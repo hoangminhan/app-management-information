@@ -11,7 +11,6 @@ import {
   Select,
   Space,
   Table,
-  Checkbox,
   Form,
   Modal,
   Spin,
@@ -23,11 +22,12 @@ import Icon, {
   DeleteOutlined,
 } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { getDataClient } from "../../services";
 import {
   deleteClientAsync,
   getDataClientAsync,
+  addClientAsync,
 } from "../../actions/clientAction";
+import convertSearch from "./../../utils/search";
 import typeClient from "../../utils/getTypeClient";
 const { Option } = Select;
 
@@ -56,11 +56,12 @@ function Clients(props) {
   const [dataDelete, setDataDelete] = useState();
   const dispatch = useDispatch();
   const clients = useSelector((state) => state.clients.listClient);
+  const location = useSelector((state) => state.clients.location);
   const [loadingTable, setLoadingTable] = useState(true);
   const [filter, setFilter] = useState({
     page: 1,
+    search: "",
   });
-  const [currentPage, setCurrentPage] = useState(1);
 
   // useEffect(() => {
   //   let dataChange = clients.reduce((acc, item, index) => {
@@ -70,10 +71,17 @@ function Clients(props) {
   //   setDataTable([...dataChange]);
   //   setLoadingTable(false);
   // }, []);
-  const handleChangePage = (page, pageSize) => {
-    dispatch(getDataClientAsync({ page: page }));
-    setCurrentPage(page);
-  };
+  // const handleChangePage = (page, pageSize) => {
+  //   dispatch(getDataClientAsync({ page: page }));
+  // };
+  useEffect(() => {
+    dispatch(getDataClientAsync({ page: filter.page, search: filter.search }));
+  }, [filter]);
+  useEffect(() => {
+    setTimeout(() => {
+      setLoadingTable(false);
+    }, 500);
+  }, [filter]);
 
   const hiddenModal = () => {
     setShowModal(false);
@@ -82,13 +90,31 @@ function Clients(props) {
   };
   const PopUpModal = () => {
     setShowModal(true);
+    form.setFieldsValue({
+      fullName: "",
+      cmnd: "",
+      phone: "",
+      address: "",
+    });
     setCheckEdit(false);
   };
   const showModalEdit = () => {
     setCheckEdit(true);
     setShowModal(true);
   };
-  const onFinish = () => {
+  const onFinish = (value) => {
+    const { fullName, phone, address, cmnd } = value;
+    let checkAdress = location.find((item, index) => {
+      return item.id === address;
+    });
+    const dataAdd = {
+      fullName,
+      phone,
+      address: { ...checkAdress },
+      cmnd,
+      text: convertSearch(fullName),
+    };
+    dispatch(addClientAsync(dataAdd));
     setShowModal(false);
   };
   const onFinishFailed = () => {
@@ -232,6 +258,17 @@ function Clients(props) {
     },
   ];
 
+  const [form] = Form.useForm();
+  // useEffect(() => {
+  //   console.log(form);
+  //   form.setFieldsValue({
+  //     name: "",
+  //     cmnd: "",
+  //     phone: "",
+  //     address: "Quận/Huyện",
+  //   });
+  // }, []);
+
   return (
     <div style={{ marginTop: "32px", height: "40px" }}>
       <Col>
@@ -255,6 +292,12 @@ function Clients(props) {
                 size="large"
                 placeholder="Tìm kiến khách hàng"
                 prefix={<SearchOutlined />}
+                onChange={(event) => {
+                  setFilter({
+                    ...filter,
+                    search: convertSearch(event.target.value),
+                  });
+                }}
               />
             </Col>
             <Col span={6}>
@@ -320,7 +363,7 @@ function Clients(props) {
 
         <Row style={{ marginTop: "32px", marginRight: "30px" }}>
           <Col span={24}>
-            <Spin spinning={false}>
+            <Spin spinning={loadingTable}>
               <Table
                 columns={columns}
                 dataSource={clients}
@@ -330,14 +373,19 @@ function Clients(props) {
                 //   indicator: !clients ? <Spin></Spin> : "",
                 // }}
                 //   pagination={false}
-              ></Table>
+              />
             </Spin>
             <Pagination
-              current={currentPage}
+              current={filter.page}
               total={50}
               size="large"
               style={{ textAlign: "right", marginTop: "10px" }}
-              onChange={handleChangePage}
+              onChange={(page) =>
+                setFilter({
+                  ...filter,
+                  page: page,
+                })
+              }
             />
           </Col>
         </Row>
@@ -354,7 +402,8 @@ function Clients(props) {
           {checkEdit ? "Cập nhập thông tin khách hàng" : "Thêm khách hàng"}
         </h2>
         <Form
-          name="basic"
+          form={form}
+          name="form-1"
           labelCol={{ span: 4 }}
           wrapperCol={{ span: 20 }}
           //   initialValues={{ remember: true }}
@@ -363,32 +412,45 @@ function Clients(props) {
         >
           <Form.Item
             label="Họ tên"
-            name="name"
-            rules={[{ required: true, message: "Please input name product!" }]}
+            name="fullName"
+            initialValue="An"
+            rules={[{ required: true, message: "Please input name client!" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="CMND"
             name="cmnd"
-            rules={[{ required: true, message: "Please input cmnd!" }]}
+            rules={[{ required: true, message: "Please input identify!" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="SĐT"
             name="phone"
-            rules={[{ required: true, message: "Please input phone number!" }]}
+            rules={[
+              { required: true, message: "Please input phone number!" },
+              {
+                pattern: /(84|0[3|5|7|8|9])+([0-9]{8})\b/,
+                message: "Sai định dạng số điện thoại",
+              },
+            ]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             label="Địa chỉ"
             name="address"
-            rules={[{ required: true, message: "Please input address!" }]}
+            rules={[{ required: true, message: "Please chose address!" }]}
           >
-            <Select defaultValue="Quận/Huyện">
-              <Option value="1">Quận 1</Option>
+            <Select defaultValue="Quận/Huyện" placeholder="Quận/Huyện">
+              {location?.map((item, index) => {
+                return (
+                  <Option key={index} value={item.id}>
+                    {item.name}
+                  </Option>
+                );
+              })}
             </Select>
           </Form.Item>
 

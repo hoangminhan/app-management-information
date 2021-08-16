@@ -3,3 +3,4 @@ export const LOGOUT = "LOGOUT";
 export const AUTHORIZATION_USER = "AUTHORIZATION_USER";
 export const GET_DATA_CLIENTS = "GET_DATA_CLIENTS";
 export const DELETE_CLIENT = "DELETE_CLIENT";
+export const ADD_CLIENT = "ADD_CLIENT";

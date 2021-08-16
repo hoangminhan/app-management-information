@@ -1,14 +1,11 @@
 import "./App.css";
-import { Layout } from "antd";
-import Header from "./components/Header/Header";
-import Menu from "./components/Menu/Menu";
 import routes from "./routes";
 import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import LoginPage from "./page/LoginPage/LoginPage";
 import { useEffect } from "react";
 import { authAsync } from "./actions/loginAction";
-import { getDataClientAsync } from "./actions/clientAction";
+// import { getDataClientAsync } from "./actions/clientAction";
 
 function App() {
   const loginStatus = useSelector((state) => state.login.loginStatus);
@@ -18,10 +15,6 @@ function App() {
     if (accessToken) {
       dispatch(authAsync());
     }
-  }, []);
-
-  useEffect(() => {
-    dispatch(getDataClientAsync({}));
   }, []);
 
   if (accessToken) {
