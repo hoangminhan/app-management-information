@@ -133,7 +133,19 @@ const clients = (state = initialState, action) => {
         listClient: [...state.listClient, action.payload],
       };
     }
-
+    case types.UPDATE_CLIENT: {
+      let { listClient } = state;
+      let newListClient = [...listClient];
+      newListClient.forEach((item, index) => {
+        if (item._id === action.payload._id) {
+          newListClient[index] = { ...action.payload, stt: index + 1 };
+        }
+      });
+      return {
+        ...state,
+        listClient: [...newListClient],
+      };
+    }
     default:
       return state;
   }

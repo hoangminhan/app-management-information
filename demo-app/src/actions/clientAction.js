@@ -59,3 +59,21 @@ export const addClientReducer = (client) => {
     payload: client,
   };
 };
+export const updateClientReducer = (client) => {
+  return {
+    type: types.UPDATE_CLIENT,
+    payload: client,
+  };
+};
+export const updateClientAsync = (client, id) => {
+  return (dispatch) => {
+    API.updateClient(client, id).then((res) => {
+      if (res.data && res.data.status) {
+        dispatch(updateClientReducer(res.data.newGuest));
+        message.success(`Cập nhập thông tin của ${client.fullName} thành công`);
+      } else {
+        message.warn("Cập nhập thông tin khách hàng thất bại");
+      }
+    });
+  };
+};

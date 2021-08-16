@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import ClientItem from "./ClientItem";
+import * as API from "./../../services/index";
 
 import {
   Button,
@@ -26,9 +27,12 @@ import {
   deleteClientAsync,
   getDataClientAsync,
   addClientAsync,
+  updateClientAsync,
 } from "../../actions/clientAction";
 import convertSearch from "./../../utils/search";
 import typeClient from "../../utils/getTypeClient";
+import { getDataProductAsync } from "../../actions/productAction";
+import formatPrice from "../../utils/formatPrice";
 const { Option } = Select;
 
 Clients.propTypes = {};
@@ -53,15 +57,36 @@ function Clients(props) {
   const [checkEdit, setCheckEdit] = useState(false);
   const [showModalProduct, setShowModalProduct] = useState(false);
   const [modalDelete, setModalDelete] = useState(false);
+  const [modalDetail, setModalDetail] = useState(false);
   const [dataDelete, setDataDelete] = useState();
   const dispatch = useDispatch();
   const clients = useSelector((state) => state.clients.listClient);
+  const products = useSelector((state) => state.products);
   const location = useSelector((state) => state.clients.location);
   const [loadingTable, setLoadingTable] = useState(true);
   const [filter, setFilter] = useState({
     page: 1,
     search: "",
+    start: "",
+    end: "",
   });
+  const [totalPageProduct, setTotalPageProduct] = useState(0);
+  const [filterProduct, setFilterProduct] = useState({
+    page: 1,
+    search: "",
+  });
+
+  const [form] = Form.useForm();
+  useEffect(() => {
+    const getDataProduct = async () => {
+      API.getDataProducts({ page: -1 }).then((res) => {
+        if (res.data && res.data.status) {
+          setTotalPageProduct(res.data.products.length);
+        }
+      });
+    };
+    getDataProduct();
+  }, []);
 
   // useEffect(() => {
   //   let dataChange = clients.reduce((acc, item, index) => {
@@ -75,13 +100,23 @@ function Clients(props) {
   //   dispatch(getDataClientAsync({ page: page }));
   // };
   useEffect(() => {
-    dispatch(getDataClientAsync({ page: filter.page, search: filter.search }));
-  }, [filter]);
-  useEffect(() => {
+    dispatch(
+      getDataClientAsync({
+        page: filter.page,
+        search: filter.search,
+        start: filter.start,
+        end: filter.end,
+      })
+    );
     setTimeout(() => {
       setLoadingTable(false);
-    }, 500);
+    }, 1000);
   }, [filter]);
+  // useEffect(() => {}, [filter]);
+  useEffect(() => {
+    const { page, search } = filterProduct;
+    dispatch(getDataProductAsync({ page, search }));
+  }, [filterProduct]);
 
   const hiddenModal = () => {
     setShowModal(false);
@@ -94,27 +129,51 @@ function Clients(props) {
       fullName: "",
       cmnd: "",
       phone: "",
-      address: "",
+      id: "",
     });
     setCheckEdit(false);
   };
-  const showModalEdit = () => {
-    setCheckEdit(true);
+  const handleUpdate = (client) => {
+    const { fullName, _id, cmnd, phone, address } = client;
     setShowModal(true);
+    form.setFieldsValue({
+      _id: _id,
+      fullName,
+      cmnd,
+      phone,
+      address: address.id,
+    });
+    setCheckEdit(true);
   };
+  // const showModalEdit = () => {
+  //   setShowModal(true);
+  // };
   const onFinish = (value) => {
-    const { fullName, phone, address, cmnd } = value;
+    const { fullName, phone, address, cmnd, _id } = value;
     let checkAdress = location.find((item, index) => {
       return item.id === address;
     });
-    const dataAdd = {
-      fullName,
-      phone,
-      address: { ...checkAdress },
-      cmnd,
-      text: convertSearch(fullName),
-    };
-    dispatch(addClientAsync(dataAdd));
+    if (!_id) {
+      const dataAdd = {
+        fullName,
+        phone,
+        address: { ...checkAdress },
+        cmnd,
+        text: convertSearch(fullName),
+      };
+      dispatch(addClientAsync(dataAdd));
+    } else {
+      const dataUpdate = {
+        // _id,
+        fullName,
+        phone,
+        address: { ...checkAdress },
+        cmnd,
+        text: convertSearch(fullName),
+      };
+      dispatch(updateClientAsync(dataUpdate, _id));
+    }
+
     setShowModal(false);
   };
   const onFinishFailed = () => {
@@ -162,7 +221,7 @@ function Clients(props) {
       render: (address) => {
         return (
           <span style={{ wordWrap: "break-word", wordBreak: "break-word" }}>
-            {address.name}
+            {address?.name || "Chưa cập nhập"}
           </span>
         );
       },
@@ -173,7 +232,7 @@ function Clients(props) {
       with: "400px",
       dataIndex: "_id",
 
-      render: (_id) => {
+      render: (_id, client) => {
         return (
           <Space size="middle">
             <Button
@@ -194,7 +253,7 @@ function Clients(props) {
             <Button
               icon={<FormOutlined />}
               style={{ backgroundColor: "#ffc021", color: "#fff" }}
-              onClick={showModalEdit}
+              onClick={() => handleUpdate(client)}
             >
               Sửa
             </Button>
@@ -215,16 +274,16 @@ function Clients(props) {
       title: "Thêm",
       align: "center",
       render: () => {
-        return <PlusOutlined style={{ color: "blue" }} />;
+        return <PlusOutlined style={{ color: "blue", cursor: "pointer" }} />;
       },
     },
     {
       title: "Tên",
       dataIndex: "name",
       key: "name",
-      render: (dataIndex) => (
+      render: (name) => (
         <span style={{ wordWrap: "break-word", wordBreak: "break-word" }}>
-          {dataIndex}
+          {name}
         </span>
       ),
     },
@@ -232,19 +291,65 @@ function Clients(props) {
       title: "Giá",
       dataIndex: "price",
       key: "price",
-      render: (dataIndex) => (
+      render: (price) => (
         <span style={{ wordWrap: "break-word", wordBreak: "break-word" }}>
-          {dataIndex}
+          {`${formatPrice(price)} đ`}
         </span>
       ),
     },
     {
       title: "Thể loại",
-      dataIndex: "type",
-      key: "type",
-      render: (dataIndex) => (
+      dataIndex: "category",
+      key: "category",
+      render: (category) => (
         <span style={{ wordWrap: "break-word", wordBreak: "break-word" }}>
-          {dataIndex}
+          {category.title}
+        </span>
+      ),
+    },
+  ];
+  const columnDetail = [
+    {
+      title: "STT",
+      align: "center",
+      width: "50px",
+      dataIndex: "stt",
+      key: "stt",
+    },
+
+    {
+      title: "Tên",
+      dataIndex: "name",
+      align: "center",
+
+      key: "name",
+      render: (name) => (
+        <span style={{ wordWrap: "break-word", wordBreak: "break-word" }}>
+          {name}
+        </span>
+      ),
+    },
+    {
+      title: "Giá",
+      dataIndex: "price",
+      align: "center",
+
+      key: "price",
+      render: (price) => (
+        <span style={{ wordWrap: "break-word", wordBreak: "break-word" }}>
+          {`${formatPrice(price)} đ`}
+        </span>
+      ),
+    },
+    {
+      title: "Ngày mua",
+      dataIndex: "date",
+      align: "center",
+
+      key: "date",
+      render: (date) => (
+        <span style={{ wordWrap: "break-word", wordBreak: "break-word" }}>
+          {date}
         </span>
       ),
     },
@@ -258,7 +363,6 @@ function Clients(props) {
     },
   ];
 
-  const [form] = Form.useForm();
   // useEffect(() => {
   //   console.log(form);
   //   form.setFieldsValue({
@@ -268,7 +372,6 @@ function Clients(props) {
   //     address: "Quận/Huyện",
   //   });
   // }, []);
-
   return (
     <div style={{ marginTop: "32px", height: "40px" }}>
       <Col>
@@ -302,7 +405,7 @@ function Clients(props) {
             </Col>
             <Col span={6}>
               <Select
-                defaultValue="Tất cả"
+                placeholder="Tất cả"
                 size="large"
                 style={{
                   width: "150px",
@@ -311,9 +414,54 @@ function Clients(props) {
                   lineHeight: "40px",
                   marginLeft: "10px",
                 }}
+                onChange={(value) => {
+                  console.log(typeof value);
+                  if (value === 0) {
+                    setFilter({
+                      ...filter,
+                      start: 0,
+                      end: 0,
+                    });
+                  } else if (value === 1) {
+                    setFilter({
+                      ...filter,
+                      start: 0,
+                      end: 5000000,
+                    });
+                  } else if (value === 2) {
+                    setFilter({
+                      ...filter,
+                      start: 5000000,
+                      end: 10000000,
+                    });
+                  } else if (value === 3) {
+                    setFilter({
+                      ...filter,
+                      start: 10000000,
+                      end: 49999999,
+                    });
+                  } else {
+                    setFilter({
+                      ...filter,
+                      start: 50000000,
+                      end: 500000000000,
+                    });
+                  }
+                }}
               >
                 <Option
-                  value="lucy"
+                  value={0}
+                  style={{
+                    width: "150px",
+                    textAlign: "left",
+                    height: "40px",
+                    lineHeight: "40px",
+                  }}
+                >
+                  Tất cả
+                </Option>
+                <Option
+                  value={1}
                   style={{
                     width: "150px",
                     textAlign: "left",
@@ -324,7 +472,7 @@ function Clients(props) {
                   Vãng lai
                 </Option>
                 <Option
-                  value="lucy"
+                  value={2}
                   style={{
                     width: "150px",
                     textAlign: "left",
@@ -335,7 +483,7 @@ function Clients(props) {
                   Tiềm năng
                 </Option>
                 <Option
-                  value="lucy"
+                  value={3}
                   style={{
                     width: "150px",
                     textAlign: "left",
@@ -346,7 +494,7 @@ function Clients(props) {
                   Vip
                 </Option>
                 <Option
-                  value="lucy"
+                  value={4}
                   style={{
                     width: "150px",
                     textAlign: "left",
@@ -410,6 +558,7 @@ function Clients(props) {
           onFinish={onFinish}
           onFinishFailed={onFinishFailed}
         >
+          <Form.Item name="_id"></Form.Item>
           <Form.Item
             label="Họ tên"
             name="fullName"
@@ -421,7 +570,13 @@ function Clients(props) {
           <Form.Item
             label="CMND"
             name="cmnd"
-            rules={[{ required: true, message: "Please input identify!" }]}
+            rules={[
+              { required: true, message: "Please input identify!" },
+              {
+                pattern: /\d{9}/,
+                message: "ID card must have 9 characters",
+              },
+            ]}
           >
             <Input />
           </Form.Item>
@@ -432,7 +587,7 @@ function Clients(props) {
               { required: true, message: "Please input phone number!" },
               {
                 pattern: /(84|0[3|5|7|8|9])+([0-9]{8})\b/,
-                message: "Sai định dạng số điện thoại",
+                message: "wrong phone number format",
               },
             ]}
           >
@@ -441,9 +596,10 @@ function Clients(props) {
           <Form.Item
             label="Địa chỉ"
             name="address"
+            initialValue="Quận/Huyện"
             rules={[{ required: true, message: "Please chose address!" }]}
           >
-            <Select defaultValue="Quận/Huyện" placeholder="Quận/Huyện">
+            <Select initialValue="Quận/Huyện" placeholder="Quận/Huyện">
               {location?.map((item, index) => {
                 return (
                   <Option key={index} value={item.id}>
@@ -478,16 +634,35 @@ function Clients(props) {
               size="large"
               placeholder="Nhập tên sản phẩm"
               prefix={<SearchOutlined />}
+              onChange={(event) => {
+                console.log(event.target.value);
+                setFilterProduct({
+                  ...filterProduct,
+                  search: convertSearch(event.target.value),
+                });
+              }}
             />
           </Col>
         </Row>
-        <Row>
+        <Row style={{ marginTop: "32px" }}>
           <Col span={24}>
             <Table
               columns={columnProduct}
-              dataSource={dataProduct}
+              dataSource={products.listProduct}
               pagination={false}
             ></Table>
+            <Pagination
+              current={filterProduct.page}
+              total={totalPageProduct}
+              size="large"
+              style={{ textAlign: "right", marginTop: "10px" }}
+              onChange={(page) =>
+                setFilterProduct({
+                  ...filterProduct,
+                  page: page,
+                })
+              }
+            />
           </Col>
         </Row>
       </Modal>
@@ -503,6 +678,50 @@ function Clients(props) {
         <h3 style={{ marginTop: "32px" }}>
           Bạn có chắc muốn xoá thông tin khách hàng không?
         </h3>
+      </Modal>
+
+      {/* Modal detail */}
+      <Modal visible={true} footer={null} width={1100}>
+        <Row>
+          <Col span={24}>
+            <h2 style={{ textAlign: "center", fontWeight: "650" }}>
+              Thông tin khách hàng
+            </h2>
+          </Col>
+          <Col span={24}>
+            <Row>
+              <Col span={8} style={{ marginTop: "12px" }}>
+                <h3 style={{ marginBottom: "32px" }}>Thông tin</h3>
+                <ul style={{ listStyle: "none", padding: "0 10px" }}>
+                  <li>
+                    <span>Họ tên: </span>
+                  </li>
+                  <li>
+                    <span>Loại khách hàng: </span>
+                  </li>
+                  <li>
+                    <span>Khu vực: </span>
+                  </li>
+                  <li>
+                    <span>CMND: </span>
+                  </li>
+                  <li>
+                    <span>Số điện thoại: </span>
+                  </li>
+                  <li>
+                    <span>Tổng chi tiêu</span>
+                  </li>
+                </ul>
+              </Col>
+              <Col span={16} style={{ marginTop: "12px" }}>
+                <h3 style={{ marginBottom: "32px" }}>
+                  Danh sách mặt hàng đã mua
+                </h3>
+                <Table columns={columnDetail} />
+              </Col>
+            </Row>
+          </Col>
+        </Row>
       </Modal>
     </div>
   );
