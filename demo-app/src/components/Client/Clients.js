@@ -37,21 +37,6 @@ const { Option } = Select;
 
 Clients.propTypes = {};
 
-const data = [
-  {
-    stt: 1,
-    name: "Hoangan",
-    type: "Vip",
-    address: "ĐăkLak",
-  },
-  {
-    stt: 1,
-    name: "Hoangan",
-    type: "Vip",
-    address: "ĐăkLak",
-  },
-];
-
 function Clients(props) {
   const [showModal, setShowModal] = useState(false);
   const [checkEdit, setCheckEdit] = useState(false);
@@ -75,6 +60,7 @@ function Clients(props) {
     page: 1,
     search: "",
   });
+  const [dataDetailClient, setDataDetailClient] = useState();
 
   const [form] = Form.useForm();
   useEffect(() => {
@@ -88,17 +74,6 @@ function Clients(props) {
     getDataProduct();
   }, []);
 
-  // useEffect(() => {
-  //   let dataChange = clients.reduce((acc, item, index) => {
-  //     let data = { ...item, stt: index + 1 };
-  //     return [...acc, data];
-  //   }, []);
-  //   setDataTable([...dataChange]);
-  //   setLoadingTable(false);
-  // }, []);
-  // const handleChangePage = (page, pageSize) => {
-  //   dispatch(getDataClientAsync({ page: page }));
-  // };
   useEffect(() => {
     dispatch(
       getDataClientAsync({
@@ -112,7 +87,7 @@ function Clients(props) {
       setLoadingTable(false);
     }, 1000);
   }, [filter]);
-  // useEffect(() => {}, [filter]);
+
   useEffect(() => {
     const { page, search } = filterProduct;
     dispatch(getDataProductAsync({ page, search }));
@@ -122,7 +97,9 @@ function Clients(props) {
     setShowModal(false);
     setShowModalProduct(false);
     setModalDelete(false);
+    setModalDetail(false);
   };
+
   const PopUpModal = () => {
     setShowModal(true);
     form.setFieldsValue({
@@ -133,6 +110,7 @@ function Clients(props) {
     });
     setCheckEdit(false);
   };
+
   const handleUpdate = (client) => {
     const { fullName, _id, cmnd, phone, address } = client;
     setShowModal(true);
@@ -145,9 +123,7 @@ function Clients(props) {
     });
     setCheckEdit(true);
   };
-  // const showModalEdit = () => {
-  //   setShowModal(true);
-  // };
+
   const onFinish = (value) => {
     const { fullName, phone, address, cmnd, _id } = value;
     let checkAdress = location.find((item, index) => {
@@ -176,18 +152,22 @@ function Clients(props) {
 
     setShowModal(false);
   };
+
   const onFinishFailed = () => {
     console.log("fail");
   };
+
   const showModalDelete = (id) => {
     console.log(id);
     setModalDelete(true);
     setDataDelete(id);
   };
+
   const confirmDeleteClient = () => {
     dispatch(deleteClientAsync(dataDelete));
     setModalDelete(false);
   };
+
   const columns = [
     {
       title: "STT",
@@ -195,7 +175,7 @@ function Clients(props) {
       dataIndex: "stt",
       key: "stt",
       render: (stt) => {
-        return <span>{stt}</span>;
+        return <span style={{ cursor: "pointer" }}>{stt}</span>;
       },
     },
     {
@@ -203,7 +183,7 @@ function Clients(props) {
       dataIndex: "fullName",
       key: "fullName",
       render: (fullName) => {
-        return <span>{fullName}</span>;
+        return <span style={{ cursor: "pointer" }}>{fullName}</span>;
       },
     },
     {
@@ -211,7 +191,9 @@ function Clients(props) {
       dataIndex: "totalMoney",
       key: "totalMoney",
       render: (totalMoney) => {
-        return <span>{typeClient(totalMoney)}</span>;
+        return (
+          <span style={{ cursor: "pointer" }}>{typeClient(totalMoney)}</span>
+        );
       },
     },
     {
@@ -220,7 +202,13 @@ function Clients(props) {
       key: "address",
       render: (address) => {
         return (
-          <span style={{ wordWrap: "break-word", wordBreak: "break-word" }}>
+          <span
+            style={{
+              wordWrap: "break-word",
+              wordBreak: "break-word",
+              cursor: "pointer",
+            }}
+          >
             {address?.name || "Chưa cập nhập"}
           </span>
         );
@@ -308,6 +296,8 @@ function Clients(props) {
       ),
     },
   ];
+  const [tableDetail, setTableDetail] = useState([]);
+
   const columnDetail = [
     {
       title: "STT",
@@ -315,6 +305,10 @@ function Clients(props) {
       width: "50px",
       dataIndex: "stt",
       key: "stt",
+      className: "cursor",
+      render: (stt) => {
+        return <span>{stt}</span>;
+      },
     },
 
     {
@@ -343,35 +337,32 @@ function Clients(props) {
     },
     {
       title: "Ngày mua",
-      dataIndex: "date",
+      dataIndex: "createdAt",
       align: "center",
 
-      key: "date",
-      render: (date) => (
+      key: "createdAt",
+      render: (createdAt) => (
         <span style={{ wordWrap: "break-word", wordBreak: "break-word" }}>
-          {date}
+          {createdAt}
         </span>
       ),
     },
   ];
-  const dataProduct = [
+  const dataDetail = [
     {
       stt: 1,
-      name: "chuộtaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      price: 12000,
-      type: "Phụ kiện",
+      name: "an",
+      price: 1234,
+      date: 12,
+    },
+    {
+      stt: 2,
+      name: "b",
+      price: 1234,
+      date: 12,
     },
   ];
 
-  // useEffect(() => {
-  //   console.log(form);
-  //   form.setFieldsValue({
-  //     name: "",
-  //     cmnd: "",
-  //     phone: "",
-  //     address: "Quận/Huyện",
-  //   });
-  // }, []);
   return (
     <div style={{ marginTop: "32px", height: "40px" }}>
       <Col>
@@ -393,7 +384,7 @@ function Clients(props) {
             <Col span={6}>
               <Input
                 size="large"
-                placeholder="Tìm kiến khách hàng"
+                placeholder="Tìm kiếm khách hàng"
                 prefix={<SearchOutlined />}
                 onChange={(event) => {
                   setFilter({
@@ -415,7 +406,6 @@ function Clients(props) {
                   marginLeft: "10px",
                 }}
                 onChange={(value) => {
-                  console.log(typeof value);
                   if (value === 0) {
                     setFilter({
                       ...filter,
@@ -513,10 +503,53 @@ function Clients(props) {
           <Col span={24}>
             <Spin spinning={loadingTable}>
               <Table
+                rowClassName="cursor:pointer"
                 columns={columns}
                 dataSource={clients}
                 bordered
                 pagination={false}
+                onRow={(record, rowIndex) => {
+                  return {
+                    onDoubleClick: (event) => {
+                      const {
+                        address,
+                        bought,
+                        cmnd,
+                        createdAt,
+                        fullName,
+                        phone,
+                        setTotalPageProduct,
+                        stt,
+                        text,
+                        totalMoney,
+                        updateAdd,
+                        _id,
+                      } = record;
+                      const newBought = bought.reduce((acc, item, index) => {
+                        // console.log(item.bought);
+                        return [...acc, { ...item.product, stt: index + 1 }];
+                      }, []);
+                      const data = {
+                        address,
+                        bought,
+                        cmnd,
+                        createdAt,
+                        fullName,
+                        phone,
+                        setTotalPageProduct,
+                        stt,
+                        text,
+                        totalMoney,
+                        updateAdd,
+                        _id,
+                      };
+                      setDataDetailClient(data);
+                      setTableDetail(newBought);
+                      setModalDetail(true);
+                    }, // click row
+                  };
+                }}
+
                 // loading={{
                 //   indicator: !clients ? <Spin></Spin> : "",
                 // }}
@@ -681,7 +714,12 @@ function Clients(props) {
       </Modal>
 
       {/* Modal detail */}
-      <Modal visible={true} footer={null} width={1100}>
+      <Modal
+        visible={modalDetail}
+        footer={null}
+        width={1100}
+        onCancel={hiddenModal}
+      >
         <Row>
           <Col span={24}>
             <h2 style={{ textAlign: "center", fontWeight: "650" }}>
@@ -694,22 +732,56 @@ function Clients(props) {
                 <h3 style={{ marginBottom: "32px" }}>Thông tin</h3>
                 <ul style={{ listStyle: "none", padding: "0 10px" }}>
                   <li>
-                    <span>Họ tên: </span>
+                    <Row>
+                      <Col span={9}>
+                        <span style={{ fontWeight: 650 }}>Họ tên: </span>
+                      </Col>
+                      {dataDetailClient?.fullName}
+                    </Row>
                   </li>
                   <li>
-                    <span>Loại khách hàng: </span>
+                    <Row>
+                      <Col span={9}>
+                        <span style={{ fontWeight: 650 }}>
+                          {" "}
+                          Loại khách hàng:{" "}
+                        </span>
+                      </Col>
+                      {typeClient(dataDetailClient?.totalMoney)}
+                    </Row>
                   </li>
                   <li>
-                    <span>Khu vực: </span>
+                    <Row>
+                      <Col span={9}>
+                        <span style={{ fontWeight: 650 }}>Khu vực: </span>
+                      </Col>
+                      {dataDetailClient?.address.name}
+                    </Row>
                   </li>
                   <li>
-                    <span>CMND: </span>
+                    <Row>
+                      <Col span={9}>
+                        <span style={{ fontWeight: 650 }}>CMND: </span>
+                      </Col>
+                      {dataDetailClient?.cmnd}
+                    </Row>
                   </li>
                   <li>
-                    <span>Số điện thoại: </span>
+                    <Row>
+                      <Col span={9}>
+                        <span style={{ fontWeight: 650 }}>Số điện thoại: </span>
+                      </Col>
+                      {dataDetailClient?.phone}
+                    </Row>
                   </li>
                   <li>
-                    <span>Tổng chi tiêu</span>
+                    <Row>
+                      {" "}
+                      <Col span={9}>
+                        <span style={{ fontWeight: 650 }}>Tổng chi tiêu</span>
+                      </Col>
+                      {formatPrice(dataDetailClient?.totalMoney)} đ
+                    </Row>
                   </li>
                 </ul>
               </Col>
@@ -717,7 +789,12 @@ function Clients(props) {
                 <h3 style={{ marginBottom: "32px" }}>
                   Danh sách mặt hàng đã mua
                 </h3>
-                <Table columns={columnDetail} />
+                <Table
+                  columns={columnDetail}
+                  dataSource={tableDetail}
+                  pagination={false}
+                  bordered
+                />
               </Col>
             </Row>
           </Col>

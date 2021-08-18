@@ -7,3 +7,11 @@ export const ADD_CLIENT = "ADD_CLIENT";
 export const UPDATE_CLIENT = "UPDATE_CLIENT";
 
 export const GET_DATA_PRODUCTS = "GET_DATA_PRODUCTS";
+export const GET_DATA_CATEGORIES = "GET_DATA_CATEGORIES";
+export const DELETE_PRODUCT = "DELETE_PRODUCT";
+export const ADD_PRODUCT = "ADD_PRODUCT";
+export const UPDATE_PRODUCT = "UPDATE_PRODUCT";
+
+export const GET_DATA_STAFF = "GET_DATA_STAFF";
+export const ADD_STAFF = "ADD_STAFF";
+export const DELETE_STAFF = "DELETE_STAFF";
