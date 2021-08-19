@@ -77,3 +77,10 @@ export const updateClientAsync = (client, id) => {
     });
   };
 };
+export const purchaseAsync = (product, id) => {
+  return (dispatch) => {
+    API.purchaseProduct(product, id).then((res) => {
+      console.log(res);
+    });
+  };
+};

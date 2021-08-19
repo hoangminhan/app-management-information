@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import LoginPage from "./page/LoginPage/LoginPage";
 import { useEffect } from "react";
 import { authAsync } from "./actions/loginAction";
+import { getDataClientAsync } from "./actions/clientAction";
 // import { getDataClientAsync } from "./actions/clientAction";
 
 function App() {

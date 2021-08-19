@@ -28,6 +28,7 @@ import {
   getDataClientAsync,
   addClientAsync,
   updateClientAsync,
+  purchaseAsync,
 } from "../../actions/clientAction";
 import convertSearch from "./../../utils/search";
 import typeClient from "../../utils/getTypeClient";
@@ -167,6 +168,24 @@ function Clients(props) {
     dispatch(deleteClientAsync(dataDelete));
     setModalDelete(false);
   };
+  const [dataPurchase, setDataPurchase] = useState();
+  const handlePurchaseProduct = (client) => {
+    console.log(client);
+    setShowModalProduct(true);
+    setDataPurchase(client);
+  };
+  const handleAddProduct = (record) => {
+    console.log(dataPurchase);
+
+    const { _id, price } = record;
+    console.log(record);
+    const dataAdd = {
+      productId: _id,
+      totalMoney: price + dataPurchase.totalMoney,
+      quantity: 1,
+    };
+    dispatch(purchaseAsync(dataAdd, dataPurchase._id));
+  };
 
   const columns = [
     {
@@ -226,7 +245,7 @@ function Clients(props) {
             <Button
               icon={<PlusOutlined />}
               type="primary"
-              onClick={() => setShowModalProduct(true)}
+              onClick={() => handlePurchaseProduct(client)}
             >
               Thêm sản phẩm
             </Button>
@@ -261,8 +280,13 @@ function Clients(props) {
     {
       title: "Thêm",
       align: "center",
-      render: () => {
-        return <PlusOutlined style={{ color: "blue", cursor: "pointer" }} />;
+      render: (record) => {
+        return (
+          <PlusOutlined
+            style={{ color: "blue", cursor: "pointer" }}
+            onClick={() => handleAddProduct(record)}
+          />
+        );
       },
     },
     {
@@ -346,20 +370,6 @@ function Clients(props) {
           {createdAt}
         </span>
       ),
-    },
-  ];
-  const dataDetail = [
-    {
-      stt: 1,
-      name: "an",
-      price: 1234,
-      date: 12,
-    },
-    {
-      stt: 2,
-      name: "b",
-      price: 1234,
-      date: 12,
     },
   ];
 
