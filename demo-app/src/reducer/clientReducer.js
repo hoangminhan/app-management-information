@@ -122,6 +122,10 @@ const clients = (state = initialState, action) => {
       const newCLients = listClient.filter((item, index) => {
         return item._id !== action.payload;
       });
+      newCLients.forEach((item, index) => {
+        console.log(item.stt);
+        item.stt = index + 1;
+      });
       return {
         ...state,
         listClient: newCLients,
@@ -153,6 +157,7 @@ const clients = (state = initialState, action) => {
       newList.forEach((item, index) => {
         if (item._id === id) {
           newList[index].bought.push({ product: record, quantity: 1 });
+          newList[index].totalMoney += record.price;
         }
       });
       return {

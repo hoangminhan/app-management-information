@@ -20,6 +20,10 @@ export const products = (state = initialState, action) => {
       const newList = listProduct.filter((item, index) => {
         return item._id !== action.payload;
       });
+      newList.forEach((item, index) => {
+        console.log(item.stt);
+        item.stt = index + 1;
+      });
       return {
         ...state,
         listProduct: [...newList],

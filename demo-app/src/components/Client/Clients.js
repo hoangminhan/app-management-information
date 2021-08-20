@@ -15,6 +15,7 @@ import {
   Form,
   Modal,
   Spin,
+  Tooltip,
 } from "antd";
 import moment from "moment";
 import Icon, {
@@ -191,47 +192,60 @@ function Clients(props) {
 
   const columns = [
     {
-      title: "STT",
+      title: "Number",
       align: "center",
       dataIndex: "stt",
       key: "stt",
       render: (stt) => {
-        return <span style={{ cursor: "pointer" }}>{stt}</span>;
-      },
-    },
-    {
-      title: "Họ tên",
-      dataIndex: "fullName",
-      key: "fullName",
-      render: (fullName) => {
-        return <span style={{ cursor: "pointer" }}>{fullName}</span>;
-      },
-    },
-    {
-      title: "Loại khách hàng",
-      dataIndex: "totalMoney",
-      key: "totalMoney",
-      render: (totalMoney) => {
         return (
-          <span style={{ cursor: "pointer" }}>{typeClient(totalMoney)}</span>
+          <Tooltip title="Double click to see detail">
+            {" "}
+            <span style={{ cursor: "pointer" }}>{stt}</span>
+          </Tooltip>
         );
       },
     },
     {
-      title: "Quận huyện",
+      title: "Full Name",
+      dataIndex: "fullName",
+      key: "fullName",
+      render: (fullName) => {
+        return (
+          <Tooltip title="Double click to see detail">
+            <span style={{ cursor: "pointer" }}>{fullName}</span>;
+          </Tooltip>
+        );
+      },
+    },
+    {
+      title: "Customer Type",
+      dataIndex: "totalMoney",
+      key: "totalMoney",
+      render: (totalMoney) => {
+        return (
+          <Tooltip title="Double click to see detail">
+            <span style={{ cursor: "pointer" }}>{typeClient(totalMoney)}</span>
+          </Tooltip>
+        );
+      },
+    },
+    {
+      title: "Address",
       dataIndex: "address",
       key: "address",
       render: (address) => {
         return (
-          <span
-            style={{
-              wordWrap: "break-word",
-              wordBreak: "break-word",
-              cursor: "pointer",
-            }}
-          >
-            {address?.name || "Chưa cập nhập"}
-          </span>
+          <Tooltip title="Double click to see detail">
+            <span
+              style={{
+                wordWrap: "break-word",
+                wordBreak: "break-word",
+                cursor: "pointer",
+              }}
+            >
+              {address?.name || "Chưa cập nhập"}
+            </span>
+          </Tooltip>
         );
       },
     },
@@ -240,6 +254,7 @@ function Clients(props) {
       title: "Action",
       with: "400px",
       dataIndex: "_id",
+      align: "center",
 
       render: (_id, client) => {
         return (
@@ -274,13 +289,13 @@ function Clients(props) {
 
   const columnProduct = [
     {
-      title: "STT",
+      title: "Number",
       align: "center",
       dataIndex: "stt",
       key: "stt",
     },
     {
-      title: "Thêm",
+      title: "Add",
       align: "center",
       render: (record) => {
         return (
@@ -292,9 +307,10 @@ function Clients(props) {
       },
     },
     {
-      title: "Tên sản phẩm",
+      title: "Product Name",
       dataIndex: "name",
       key: "name",
+      align: "center",
       render: (name) => (
         <span style={{ wordWrap: "break-word", wordBreak: "break-word" }}>
           {name}
@@ -302,7 +318,7 @@ function Clients(props) {
       ),
     },
     {
-      title: "Giá",
+      title: "Price",
       dataIndex: "price",
       key: "price",
       render: (price) => (
@@ -312,7 +328,7 @@ function Clients(props) {
       ),
     },
     {
-      title: "Thể loại",
+      title: "Type",
       dataIndex: "category",
       key: "category",
       render: (category) => (
@@ -699,6 +715,7 @@ function Clients(props) {
             <Pagination
               current={filterProduct.page}
               total={totalPageProduct}
+              pageSize={8}
               size="large"
               style={{ textAlign: "right", marginTop: "10px" }}
               onChange={(page) =>

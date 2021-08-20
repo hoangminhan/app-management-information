@@ -19,7 +19,6 @@ function App() {
   }, []);
 
   if (accessToken) {
-    debugger;
     return (
       <BrowserRouter>
         {/* <Layout>

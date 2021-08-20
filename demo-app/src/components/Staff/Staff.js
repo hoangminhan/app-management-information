@@ -101,7 +101,7 @@ function Staff(props) {
 
   const columns = [
     {
-      title: "STT",
+      title: "Number",
       align: "center",
       dataIndex: "stt",
       key: "stt",
@@ -117,7 +117,7 @@ function Staff(props) {
       width: "200px",
 
       key: "image",
-      render: (image) => {
+      render: (image, staff) => {
         return (
           <div>
             <img
@@ -130,12 +130,13 @@ function Staff(props) {
                 borderRadius: "50%",
               }}
             ></img>
+            <p>{staff.fullName}</p>
           </div>
         );
       },
     },
     {
-      title: "Thông tin",
+      title: "Information",
       dataIndex: "infor",
       align: "center",
 
