@@ -146,6 +146,20 @@ const clients = (state = initialState, action) => {
         listClient: [...newListClient],
       };
     }
+    case types.ADD_PRODUCT_CLIENT: {
+      const { id, record } = action.payload;
+      const { listClient } = state;
+      const newList = [...listClient];
+      newList.forEach((item, index) => {
+        if (item._id === id) {
+          newList[index].bought.push({ product: record, quantity: 1 });
+        }
+      });
+      return {
+        ...state,
+        listClient: newList,
+      };
+    }
     default:
       return state;
   }

@@ -77,10 +77,22 @@ export const updateClientAsync = (client, id) => {
     });
   };
 };
-export const purchaseAsync = (product, id) => {
+export const purchaseAsync = (product, id, record) => {
   return (dispatch) => {
     API.purchaseProduct(product, id).then((res) => {
-      console.log(res);
+      if (res.data.status) {
+        message.success("thêm sản phẩm thành công");
+        const data = { id: id, record: record };
+        dispatch(purchaseReducer(data));
+      } else {
+        message.error("Thêm sản phẩm thất bại");
+      }
     });
+  };
+};
+export const purchaseReducer = (record) => {
+  return {
+    type: types.ADD_PRODUCT_CLIENT,
+    payload: record,
   };
 };

@@ -21,6 +21,7 @@ function Login(props) {
       .then((res) => {
         debugger;
         if (res.data && res.data.status) {
+          debugger;
           localStorage.setItem("accessToken", res.data.token);
           dispatch(loginReducer(res.data.user));
           message.success("Đăng nhập thành công");
@@ -28,6 +29,7 @@ function Login(props) {
         } else {
           message.error("Sai tên đăng nhập hoặc tài khoản!!");
         }
+        return res;
       })
       .catch((err) => console.log(err));
   };

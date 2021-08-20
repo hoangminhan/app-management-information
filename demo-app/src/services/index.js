@@ -28,7 +28,7 @@ export const deleteClient = (id) => {
 export const addClient = (client) => {
   return callApi("/guests", "POST", client);
 };
-export const purchaseProduct = (product, _id) => {
+export const purchaseProduct = (product, _id, record) => {
   return callApi(`/guests/${_id}/bought`, "PUT", product);
 };
 export const updateClient = (client, id) => {

@@ -106,13 +106,15 @@ function Home(props) {
 
   return (
     <>
-      <Row style={{ marginTop: "32px" }}>
-        <Col span={12}>
-          {loadingSpin ? (
-            <div style={{ textAlign: "center" }}>
-              <Spin size="large" />
-            </div>
-          ) : (
+      {loadingSpin ? (
+        <div
+          style={{ textAlign: "center", height: "100vh", lineHeight: "100vh" }}
+        >
+          <Spin size="large" />
+        </div>
+      ) : (
+        <Row style={{ marginTop: "32px" }}>
+          <Col span={12}>
             <Doughnut
               style={{ maxHeight: "400px" }}
               data={{
@@ -138,22 +140,18 @@ function Home(props) {
                 },
               }}
             />
-          )}
-          <h3 style={{ textAlign: "center", marginTop: "10px" }}>
-            Loại khách hàng
-          </h3>
-        </Col>
-        <Col span={24}>
-          <h3 style={{ textAlign: "center" }}>Quận huyện</h3>
-          {loadingSpin ? (
-            <div style={{ textAlign: "center" }}>
-              <Spin size="large" />
-            </div>
-          ) : (
+
+            <h3 style={{ textAlign: "center", marginTop: "10px" }}>
+              Loại khách hàng
+            </h3>
+          </Col>
+          <Col span={24}>
+            <h3 style={{ textAlign: "center" }}>Quận huyện</h3>
+
             <Bar data={dataChart.data} options={dataChart.options} />
-          )}
-        </Col>
-      </Row>
+          </Col>
+        </Row>
+      )}
     </>
   );
 }

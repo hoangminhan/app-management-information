@@ -16,6 +16,7 @@ import {
   Modal,
   Spin,
 } from "antd";
+import moment from "moment";
 import Icon, {
   PlusOutlined,
   SearchOutlined,
@@ -170,7 +171,6 @@ function Clients(props) {
   };
   const [dataPurchase, setDataPurchase] = useState();
   const handlePurchaseProduct = (client) => {
-    console.log(client);
     setShowModalProduct(true);
     setDataPurchase(client);
   };
@@ -184,7 +184,9 @@ function Clients(props) {
       totalMoney: price + dataPurchase.totalMoney,
       quantity: 1,
     };
-    dispatch(purchaseAsync(dataAdd, dataPurchase._id));
+    dispatch(purchaseAsync(dataAdd, dataPurchase._id, record));
+    console.log(dataPurchase._id);
+    setShowModalProduct(false);
   };
 
   const columns = [
@@ -290,7 +292,7 @@ function Clients(props) {
       },
     },
     {
-      title: "Tên",
+      title: "Tên sản phẩm",
       dataIndex: "name",
       key: "name",
       render: (name) => (
@@ -367,7 +369,7 @@ function Clients(props) {
       key: "createdAt",
       render: (createdAt) => (
         <span style={{ wordWrap: "break-word", wordBreak: "break-word" }}>
-          {createdAt}
+          {moment(createdAt).format("MM/DD/YYYY")}
         </span>
       ),
     },
