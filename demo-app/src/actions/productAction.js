@@ -5,6 +5,7 @@ import { products } from "../reducer/producReducer";
 import { updateClientReducer } from "./clientAction";
 
 export const getDataProductAsync = (params) => {
+  console.log({ params });
   return (dispatch) => {
     API.getDataProducts(params).then((res) => {
       if (res.data && res.data.status) {
@@ -58,7 +59,7 @@ export const addProductAsync = (product) => {
         message.success("Thêm sản phẩm thành công");
         dispatch(addProductReducer(res.data.newProduct));
       } else {
-        message.error("Thêm sản phẩm thất bại!");
+        message.error("Sản phẩm đã tồn tại!");
       }
     });
   };

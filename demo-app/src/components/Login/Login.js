@@ -19,9 +19,7 @@ function Login(props) {
     };
     login(data)
       .then((res) => {
-        debugger;
         if (res.data && res.data.status) {
-          debugger;
           localStorage.setItem("accessToken", res.data.token);
           dispatch(loginReducer(res.data.user));
           message.success("Đăng nhập thành công");
@@ -43,7 +41,7 @@ function Login(props) {
           height: "100vh",
         }}
       >
-        <Col span={10}>
+        <Col span={8}>
           <Title
             levet={3}
             style={{ textAlign: "center", marginBottom: "50px" }}
@@ -53,8 +51,8 @@ function Login(props) {
 
           <Form
             name="basic"
-            labelCol={{ span: 6 }}
-            wrapperCol={{ span: 24 }}
+            labelCol={{ span: 5 }}
+            wrapperCol={{ span: 18 }}
             // initialValues={{ remember: true }}
             onFinish={handleSbumit}
             //   onFinishFailed={onFinishFailed}
@@ -84,7 +82,11 @@ function Login(props) {
               wrapperCol={{ span: 24 }}
               style={{ textAlign: "center" }}
             >
-              <Button type="primary" htmlType="submit">
+              <Button
+                type="primary"
+                htmlType="submit"
+                style={{ minWidth: "100px" }}
+              >
                 Submit
               </Button>
             </Form.Item>

@@ -21,7 +21,6 @@ export const products = (state = initialState, action) => {
         return item._id !== action.payload;
       });
       newList.forEach((item, index) => {
-        console.log(item.stt);
         item.stt = index + 1;
       });
       return {
@@ -30,10 +29,15 @@ export const products = (state = initialState, action) => {
       };
     }
     case types.ADD_PRODUCT: {
-      return {
-        ...state,
-        listProduct: [...state.listProduct, action.payload],
-      };
+      // console.log(action.payload);
+      // return {
+      //   ...state,
+      //   listProduct: [
+      //     ...state.listProduct,
+      //     { ...action.payload, stt: state.listProduct.length + 1 },
+      //   ],
+      // };
+      return state;
     }
     case types.UPDATE_PRODUCT: {
       let { listProduct } = state;

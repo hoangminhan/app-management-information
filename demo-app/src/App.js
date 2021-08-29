@@ -21,10 +21,6 @@ function App() {
   if (accessToken) {
     return (
       <BrowserRouter>
-        {/* <Layout>
-          <Menu />
-          <Header />
-        </Layout> */}
         <Switch>
           {routes &&
             routes.map((item, index) => {

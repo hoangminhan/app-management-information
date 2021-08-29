@@ -132,10 +132,17 @@ const clients = (state = initialState, action) => {
       };
     }
     case types.ADD_CLIENT: {
-      return {
-        ...state,
-        listClient: [...state.listClient, action.payload],
-      };
+      // const { listClient } = state;
+      // const newList = [...listClient, action.payload];
+      // const newData = newList.map((item, index) => {
+      //   return { ...item, stt: index + 1 };
+      // });
+
+      // return {
+      //   ...state,
+      //   listClient: [...newData],
+      // };
+      return state;
     }
     case types.UPDATE_CLIENT: {
       let { listClient } = state;

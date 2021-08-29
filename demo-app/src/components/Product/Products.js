@@ -106,7 +106,7 @@ const Products = (props) => {
       },
     },
     {
-      title: "Tên sản phẩm",
+      title: "PRODUCT NAME",
       align: "center",
       dataIndex: "name",
       key: "name",
@@ -115,7 +115,7 @@ const Products = (props) => {
       },
     },
     {
-      title: "Thể loại",
+      title: "TYPE",
       align: "center",
       dataIndex: "category",
       key: "category",
@@ -124,7 +124,7 @@ const Products = (props) => {
       },
     },
     {
-      title: "Giá",
+      title: "PRICE",
       align: "center",
       dataIndex: "price",
       key: "price",
@@ -144,7 +144,7 @@ const Products = (props) => {
     },
 
     {
-      title: "Action",
+      title: "ACTION",
       align: "center",
       maxWidth: "300px",
       dataIndex: "_id",
@@ -214,6 +214,7 @@ const Products = (props) => {
                   const data = event.target.value;
                   setFliter({
                     ...filter,
+                    page: 1,
                     search: convertSearch(data),
                   });
                 }}
@@ -226,6 +227,7 @@ const Products = (props) => {
             columns={columns}
             dataSource={products.listProduct}
             pagination={false}
+            bordered
           />
           <Pagination
             pageSize={8}

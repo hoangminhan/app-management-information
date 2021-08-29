@@ -24,7 +24,7 @@ export const addStaffAsync = (staff) => {
           dispatch(addStaffReducer(res.data.staff));
           message.success("Thêm nhân viên thành công!");
         } else {
-          message.error("Thêm sản phẩm thất bại!");
+          message.error("Thêm nhân viên thất bại!");
         }
       })
       .catch((err) => {

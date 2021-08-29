@@ -49,6 +49,10 @@ function Clients(props) {
   const [dataDelete, setDataDelete] = useState();
   const dispatch = useDispatch();
   const clients = useSelector((state) => state.clients.listClient);
+  const totalClients = useSelector(
+    (state) => state.clients.clientPage.totalPage
+  );
+
   const products = useSelector((state) => state.products);
   const location = useSelector((state) => state.clients.location);
   const [loadingTable, setLoadingTable] = useState(true);
@@ -60,7 +64,7 @@ function Clients(props) {
   });
   const [totalPageProduct, setTotalPageProduct] = useState(0);
   const [filterProduct, setFilterProduct] = useState({
-    page: 1,
+    page: -1,
     search: "",
   });
   const [dataDetailClient, setDataDetailClient] = useState();
@@ -192,10 +196,11 @@ function Clients(props) {
 
   const columns = [
     {
-      title: "Number",
+      title: "STT",
       align: "center",
       dataIndex: "stt",
       key: "stt",
+      align: "center",
       render: (stt) => {
         return (
           <Tooltip title="Double click to see detail">
@@ -206,9 +211,11 @@ function Clients(props) {
       },
     },
     {
-      title: "Full Name",
+      title: "FULL NAME",
       dataIndex: "fullName",
       key: "fullName",
+      align: "center",
+
       render: (fullName) => {
         return (
           <Tooltip title="Double click to see detail">
@@ -218,9 +225,11 @@ function Clients(props) {
       },
     },
     {
-      title: "Customer Type",
+      title: "CUSTOMER TYPE",
       dataIndex: "totalMoney",
       key: "totalMoney",
+      align: "center",
+
       render: (totalMoney) => {
         return (
           <Tooltip title="Double click to see detail">
@@ -230,7 +239,9 @@ function Clients(props) {
       },
     },
     {
-      title: "Address",
+      title: "ADDRESS",
+      align: "center",
+
       dataIndex: "address",
       key: "address",
       render: (address) => {
@@ -251,7 +262,7 @@ function Clients(props) {
     },
 
     {
-      title: "Action",
+      title: "ACTION",
       with: "400px",
       dataIndex: "_id",
       align: "center",
@@ -289,13 +300,13 @@ function Clients(props) {
 
   const columnProduct = [
     {
-      title: "Number",
+      title: "STT",
       align: "center",
       dataIndex: "stt",
       key: "stt",
     },
     {
-      title: "Add",
+      title: "ADD",
       align: "center",
       render: (record) => {
         return (
@@ -307,7 +318,7 @@ function Clients(props) {
       },
     },
     {
-      title: "Product Name",
+      title: "PRODUCT NAME",
       dataIndex: "name",
       key: "name",
       align: "center",
@@ -318,9 +329,11 @@ function Clients(props) {
       ),
     },
     {
-      title: "Price",
+      title: "PRICE",
       dataIndex: "price",
       key: "price",
+      align: "center",
+
       render: (price) => (
         <span style={{ wordWrap: "break-word", wordBreak: "break-word" }}>
           {`${formatPrice(price)} đ`}
@@ -328,7 +341,7 @@ function Clients(props) {
       ),
     },
     {
-      title: "Type",
+      title: "TYPE",
       dataIndex: "category",
       key: "category",
       render: (category) => (
@@ -391,8 +404,10 @@ function Clients(props) {
     },
   ];
 
+  console.log(products.listProduct);
+
   return (
-    <div style={{ marginTop: "32px", height: "40px" }}>
+    <div style={{ marginTop: "32px" }}>
       <Col>
         <Row>
           <Col span={6}>
@@ -417,6 +432,7 @@ function Clients(props) {
                 onChange={(event) => {
                   setFilter({
                     ...filter,
+                    page: 1,
                     search: convertSearch(event.target.value),
                   });
                 }}
@@ -586,7 +602,8 @@ function Clients(props) {
             </Spin>
             <Pagination
               current={filter.page}
-              total={50}
+              total={totalClients}
+              pageSize={10}
               size="large"
               style={{ textAlign: "right", marginTop: "10px" }}
               onChange={(page) =>
@@ -623,8 +640,13 @@ function Clients(props) {
           <Form.Item
             label="Họ tên"
             name="fullName"
-            initialValue="An"
-            rules={[{ required: true, message: "Please input name client!" }]}
+            rules={[
+              { required: true, message: "Please input name client!" },
+              {
+                pattern: /[a-zA-Z- ]+$/,
+                message: "Name must be string",
+              },
+            ]}
           >
             <Input />
           </Form.Item>
@@ -634,7 +656,7 @@ function Clients(props) {
             rules={[
               { required: true, message: "Please input identify!" },
               {
-                pattern: /\d{9}/,
+                pattern: /[0-9]{9}/,
                 message: "ID card must have 9 characters",
               },
             ]}
@@ -648,7 +670,7 @@ function Clients(props) {
               { required: true, message: "Please input phone number!" },
               {
                 pattern: /(84|0[3|5|7|8|9])+([0-9]{8})\b/,
-                message: "wrong phone number format",
+                message: "wrong format phone number ",
               },
             ]}
           >
@@ -696,9 +718,9 @@ function Clients(props) {
               placeholder="Nhập tên sản phẩm"
               prefix={<SearchOutlined />}
               onChange={(event) => {
-                console.log(event.target.value);
                 setFilterProduct({
                   ...filterProduct,
+                  page: 1,
                   search: convertSearch(event.target.value),
                 });
               }}
@@ -711,8 +733,10 @@ function Clients(props) {
               columns={columnProduct}
               dataSource={products.listProduct}
               pagination={false}
+              bordered
+              scroll={{ y: 400 }}
             ></Table>
-            <Pagination
+            {/* <Pagination
               current={filterProduct.page}
               total={totalPageProduct}
               pageSize={8}
@@ -724,7 +748,7 @@ function Clients(props) {
                   page: page,
                 })
               }
-            />
+            /> */}
           </Col>
         </Row>
       </Modal>

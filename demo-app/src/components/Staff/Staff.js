@@ -22,6 +22,7 @@ import {
   PlusOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
+
 import {
   addStaffAsync,
   deleteStaffAsync,
@@ -33,6 +34,8 @@ function Staff(props) {
   const [modalAction, setModalAction] = useState(false);
   const dispatch = useDispatch();
   const staffs = useSelector((state) => state.staffs.listStaff);
+  const roleAccount = useSelector((state) => state.login.user.role);
+  console.log(roleAccount);
   const [filter, setFilter] = useState({
     page: 1,
     search: "",
@@ -101,7 +104,7 @@ function Staff(props) {
 
   const columns = [
     {
-      title: "Number",
+      title: "STT",
       align: "center",
       dataIndex: "stt",
       key: "stt",
@@ -111,7 +114,7 @@ function Staff(props) {
       },
     },
     {
-      title: "Avatar",
+      title: "AVATAR",
       dataIndex: "image",
       align: "center",
       width: "200px",
@@ -121,7 +124,7 @@ function Staff(props) {
         return (
           <div>
             <img
-              src={image.url}
+              src={image?.url}
               style={{
                 minWidth: "130px",
                 maxWidth: "130px",
@@ -129,6 +132,7 @@ function Staff(props) {
                 maxHeight: "130px",
                 borderRadius: "50%",
               }}
+              alt="Chưa thêm"
             ></img>
             <p>{staff.fullName}</p>
           </div>
@@ -136,7 +140,7 @@ function Staff(props) {
       },
     },
     {
-      title: "Information",
+      title: "INFORMATION",
       dataIndex: "infor",
       align: "center",
 
@@ -180,7 +184,7 @@ function Staff(props) {
     },
 
     {
-      title: "Action",
+      title: "ACTION",
       with: "400px",
       dataIndex: "_id",
       align: "center",
@@ -276,7 +280,7 @@ function Staff(props) {
           <Row
             style={{
               display: "flex",
-              justifyContent: "flex-end",
+              justifyContent: "flex-start",
               marginTop: "32px",
             }}
           >
@@ -290,7 +294,7 @@ function Staff(props) {
                 Thêm nhân viên
               </Button>
             </Col>
-            <Col span={5}>
+            {/* <Col span={5}>
               <Input
                 size="large"
                 placeholder="Tìm kiếm nhân viên"
@@ -303,11 +307,16 @@ function Staff(props) {
                   });
                 }}
               />
-            </Col>
+            </Col> */}
           </Row>
         </Col>
         <Col span={24}>
-          <Table columns={columns} dataSource={staffs} pagination={false} />
+          <Table
+            columns={columns}
+            dataSource={staffs}
+            pagination={false}
+            bordered
+          />
         </Col>
         <Modal
           visible={modalDelete}
@@ -341,12 +350,12 @@ function Staff(props) {
                 <Form.Item
                   label="Avatar"
                   name="avatar"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Please input avatar!",
-                    },
-                  ]}
+                  // rules={[
+                  //   {
+                  //     required: true,
+                  //     message: "Please input avatar!",
+                  //   },
+                  // ]}
                 >
                   <Upload
                     name="avatar"
@@ -386,6 +395,10 @@ function Staff(props) {
                       required: true,
                       message: "Please input your username!",
                     },
+                    {
+                      pattern: /[a-zA-Z- ]+$/,
+                      message: "Name must be string",
+                    },
                   ]}
                 >
                   <Input />
@@ -398,6 +411,10 @@ function Staff(props) {
                       required: true,
                       message: "Please input your phone number!",
                     },
+                    {
+                      pattern: /(84|0[3|5|7|8|9])+([0-9]{8})\b/,
+                      message: "wrong format phone number",
+                    },
                   ]}
                 >
                   <Input />
@@ -409,6 +426,10 @@ function Staff(props) {
                     {
                       required: true,
                       message: "Please input your email!",
+                    },
+                    {
+                      pattern: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
+                      message: "wrong format email",
                     },
                   ]}
                 >
